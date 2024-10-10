@@ -232,6 +232,8 @@ This is an unapproved algorithm.
 
 =over 4
 
+=item CRNG-TEST, see L<EVP_RAND-CRNG-TEST(7)>
+
 =item CTR-DRBG, see L<EVP_RAND-CTR-DRBG(7)>
 
 =item HASH-DRBG, see L<EVP_RAND-HASH-DRBG(7)>
@@ -338,6 +340,8 @@ The FIPS module passes the following descriptions(s) to OSSL_SELF_TEST_onbegin()
 "Module_Integrity" and "Install_Integrity" use this.
 
 =item "RSA" (B<OSSL_SELF_TEST_DESC_PCT_RSA_PKCS1>)
+
+=item "RSA" (B<OSSL_SELF_TEST_DESC_PCT_RSA>)
 
 =item "ECDSA" (B<OSSL_SELF_TEST_DESC_PCT_ECDSA>)
 

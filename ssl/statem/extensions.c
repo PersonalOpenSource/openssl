@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2016-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -1382,12 +1382,15 @@ static int final_key_share(SSL_CONNECTION *s, unsigned int context, int sent)
      *     fail;
      */
     if (!s->server
-            && !sent
-            && (!s->hit
-                || (s->ext.psk_kex_mode & TLSEXT_KEX_MODE_FLAG_KE) == 0)) {
-        /* Nothing left we can do - just fail */
-        SSLfatal(s, SSL_AD_MISSING_EXTENSION, SSL_R_NO_SUITABLE_KEY_SHARE);
-        return 0;
+            && !sent) {
+        if ((s->ext.psk_kex_mode & TLSEXT_KEX_MODE_FLAG_KE) == 0) {
+            SSLfatal(s, SSL_AD_ILLEGAL_PARAMETER, SSL_R_NO_SUITABLE_KEY_SHARE);
+            return 0;
+        }
+        if (!s->hit) {
+            SSLfatal(s, SSL_AD_MISSING_EXTENSION, SSL_R_NO_SUITABLE_KEY_SHARE);
+            return 0;
+        }
     }
     /*
      * IF
@@ -1553,7 +1556,7 @@ int tls_psk_do_binder(SSL_CONNECTION *s, const EVP_MD *md,
     SSL_CTX *sctx = SSL_CONNECTION_GET_CTX(s);
 
     /* Ensure cast to size_t is safe */
-    if (!ossl_assert(hashsizei >= 0)) {
+    if (!ossl_assert(hashsizei > 0)) {
         SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
         goto err;
     }

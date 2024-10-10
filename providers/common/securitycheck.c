@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2020-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -19,7 +19,8 @@
 #include <openssl/core_names.h>
 #include <openssl/obj_mac.h>
 #include "prov/securitycheck.h"
-#include "prov/fipsindicator.h"
+
+#define OSSL_FIPS_MIN_SECURITY_STRENGTH_BITS 112
 
 int ossl_rsa_key_op_get_protect(const RSA *rsa, int operation, int *outprotect)
 {
@@ -78,7 +79,12 @@ int ossl_rsa_check_key_size(const RSA *rsa, int protect)
  */
 int ossl_kdf_check_key_size(size_t keylen)
 {
-    return (keylen * 8) >= 112;
+    return (keylen * 8) >= OSSL_FIPS_MIN_SECURITY_STRENGTH_BITS;
+}
+
+int ossl_mac_check_key_size(size_t keylen)
+{
+    return ossl_kdf_check_key_size(keylen);
 }
 
 #ifndef OPENSSL_NO_EC
@@ -126,7 +132,7 @@ int ossl_ec_check_security_strength(const EC_GROUP *group, int protect)
      * For signing or key agreement only allow curves with at least 112 bits of
      * security strength
      */
-    if (protect && strength < 112)
+    if (protect && strength < OSSL_FIPS_MIN_SECURITY_STRENGTH_BITS)
         return 0;
     return 1;
 }

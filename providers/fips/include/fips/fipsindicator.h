@@ -13,6 +13,7 @@
 # include <openssl/indicator.h>
 # include "crypto/types.h"
 # include <openssl/ec.h>
+# include "fipscommon.h"
 
 /*
  * There may be multiple settables associated with an algorithm that allow
@@ -114,12 +115,12 @@ void ossl_FIPS_IND_copy(OSSL_FIPS_IND *dst, const OSSL_FIPS_IND *src);
 # define OSSL_FIPS_IND_GET_CTX_PARAM(ctx, prms) \
     ossl_FIPS_IND_get_ctx_param(&((ctx)->indicator), prms)
 
-# define OSSL_FIPS_IND_GET(ctx) &((ctx)->indicator)
+# define OSSL_FIPS_IND_GET(ctx) (&((ctx)->indicator))
 
 # define OSSL_FIPS_IND_GET_PARAM(ctx, p, settable, id, name)                   \
     *settable = ossl_FIPS_IND_get_settable(&((ctx)->indicator), id);           \
     if (*settable != OSSL_FIPS_IND_STATE_UNKNOWN)                              \
-        *p = OSSL_PARAM_construct_int(name, settable);                         \
+        *p = OSSL_PARAM_construct_int(name, settable);
 
 int ossl_fips_ind_rsa_key_check(OSSL_FIPS_IND *ind, int id, OSSL_LIB_CTX *libctx,
                                 const RSA *rsa, const char *desc, int protect);
@@ -128,8 +129,8 @@ int ossl_fips_ind_ec_key_check(OSSL_FIPS_IND *ind, int id, OSSL_LIB_CTX *libctx,
                                const EC_GROUP *group, const char *desc,
                                int protect);
 # endif
-int ossl_fips_ind_digest_check(OSSL_FIPS_IND *ind, int id, OSSL_LIB_CTX *libctx,
-                               const EVP_MD *md, const char *desc);
+int ossl_fips_ind_digest_exch_check(OSSL_FIPS_IND *ind, int id, OSSL_LIB_CTX *libctx,
+                                    const EVP_MD *md, const char *desc);
 int ossl_fips_ind_digest_sign_check(OSSL_FIPS_IND *ind, int id,
                                     OSSL_LIB_CTX *libctx,
                                     int nid, int sha1_allowed,
